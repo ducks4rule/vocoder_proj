@@ -208,3 +208,9 @@ Press `q` to quit.
 - [ ] Add command-line arguments
 - [ ] Create man page
 - [ ] Create PKGBUILD for AUR
+
+### Future Design Considerations
+- [ ] Consider switching to callback-based audio (async) for lower latency
+  - Current: loop-based (polling) - simpler, easier to debug
+  - Future: callback-based - lower CPU, lower latency, more complex
+  - Would require restructuring main loop and adding thread synchronization

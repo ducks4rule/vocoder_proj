@@ -13,7 +13,7 @@ void PitchShifter::set_pitch_ratio(float ratio) {
 }
 
 void PitchShifter::process(const float* input, float* output, int num_frames) {
-    (void)input;
-    (void)output;
-    (void)num_frames;
+    for (int i = 0; i < num_frames; i++) {
+        output[i] = input[i];
+    }
 }

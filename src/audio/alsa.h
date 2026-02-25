@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <alsa/asoundlib.h>
 
 class ALSADevice {
 public:
@@ -19,8 +20,8 @@ public:
     int get_buffer_size() const { return buffer_size_; }
 
 private:
-    void* pcm_capture_;
-    void* pcm_playback_;
+    snd_pcm_t* pcm_capture_;
+    snd_pcm_t* pcm_playback_;
     int sample_rate_;
     int channels_;
     int buffer_size_;
