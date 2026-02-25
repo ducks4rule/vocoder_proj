@@ -108,11 +108,74 @@ Press `q` to quit.
 
 ## TODO
 
-- [ ] Create project structure (CMakeLists.txt, src directories)
-- [ ] Implement ALSA audio capture and playback
-- [ ] Implement FFT wrapper using fftw3
-- [ ] Implement SMB pitch shift algorithm
-- [ ] Implement TUI with spectrum visualizer
-- [ ] Implement keyboard controls
-- [ ] Test and verify audio processing works
-- [ ] Build and test on target system
+### Phase 1: Project Setup
+- [x] Create project directory structure (src/audio, src/dsp, src/ui)
+- [x] Create CMakeLists.txt with build configuration
+- [x] Create .gitignore
+- [ ] Create stub source files for compilation test
+
+### Phase 2: Audio I/O
+- [ ] Implement ALSA audio capture (microphone input)
+  - [ ] Initialize ALSA PCM device
+  - [ ] Configure capture parameters (44100Hz, 16-bit, mono)
+  - [ ] Implement ring buffer for audio data
+  - [ ] Handle audio device errors and recovery
+- [ ] Implement ALSA audio playback (speaker output)
+  - [ ] Initialize playback PCM device
+  - [ ] Configure playback parameters
+  - [ ] Implement low-latency output buffer
+  - [ ] Sync capture and playback streams
+
+### Phase 3: DSP / Pitch Shifting
+- [ ] Implement FFT wrapper (fftw3)
+  - [ ] Create forward FFT function
+  - [ ] Create inverse FFT function
+  - [ ] Handle memory allocation and cleanup
+- [ ] Implement SMB PitchShift algorithm
+  - [ ] Implement Hann window function
+  - [ ] Implement STFT (Short-Time Fourier Transform)
+  - [ ] Implement frequency bin scaling for pitch shift
+  - [ ] Implement phase vocoder for smooth pitch shifting
+  - [ ] Implement overlap-add synthesis
+- [ ] Implement log-frequency transformation
+
+### Phase 4: TUI
+- [ ] Implement ncurses TUI framework
+  - [ ] Initialize ncurses (colors, keypad, cursor)
+  - [ ] Create main render loop
+  - [ ] Handle terminal resize
+  - [ ] Cleanup on exit
+- [ ] Implement spectrum visualizer
+  - [ ] Convert FFT magnitude to dB scale
+  - [ ] Map to ASCII/UTF-8 characters
+  - [ ] Implement log-frequency scaling for display
+- [ ] Implement UI components
+  - [ ] Input level meter (VU meter)
+  - [ ] Pitch shift display (semitones + ratio)
+  - [ ] Frequency spectrum display
+- [ ] Implement help overlay
+
+### Phase 5: Controls
+- [ ] Implement keyboard input handling
+  - [ ] Homerow keys (A-K) for pitch selection
+  - [ ] +/- for frequency ratio adjustment
+  - [ ] =/_ for fine tune
+  - [ ] r - reset pitch
+  - [ ] m - mute/unmute
+  - [ ] h - toggle help
+  - [ ] q - quit
+
+### Phase 6: Integration & Testing
+- [ ] Integrate audio, DSP, and TUI components
+- [ ] Test real-time audio processing latency
+- [ ] Tune FFT size and hop size for performance
+- [ ] Handle audio glitches and buffer underruns
+- [ ] Test on target system (Arch Linux)
+- [ ] Optimize for low CPU usage
+
+### Phase 7: Polish
+- [ ] Add error handling throughout
+- [ ] Add configuration file support
+- [ ] Add command-line arguments
+- [ ] Create man page
+- [ ] Create PKGBUILD for AUR
