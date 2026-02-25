@@ -112,7 +112,7 @@ Press `q` to quit.
 - [x] Create project directory structure (src/audio, src/dsp, src/ui)
 - [x] Create CMakeLists.txt with build configuration
 - [x] Create .gitignore
-- [ ] Create stub source files for compilation test
+- [x] Create stub source files for compilation test
 
 ### Phase 2: Audio I/O
 - [ ] Implement ALSA audio capture (microphone input)
