@@ -1,0 +1,14 @@
+build/
+*.o
+*.a
+*.so
+*.dylib
+*.dll
+vocoder-tui
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+*.swp
+*.swo
+*~
