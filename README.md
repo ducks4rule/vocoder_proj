@@ -126,6 +126,17 @@ Press `q` to quit.
   - [ ] Implement low-latency output buffer
   - [ ] Sync capture and playback streams
 
+### Phase 2.5: Audio Features
+- [ ] Add mute/unmute microphone
+- [ ] Add output volume control (0.0 - 1.0)
+- [ ] Add playback delay (monitoring delay)
+  - [ ] Implement ring buffer for delay
+  - [ ] Make delay configurable (0-500ms)
+- [ ] Add device selection
+  - [ ] List available audio devices
+  - [ ] Allow selecting capture device
+  - [ ] Allow selecting playback device
+
 ### Phase 3: DSP / Pitch Shifting
 - [ ] Implement FFT wrapper (fftw3)
   - [ ] Create forward FFT function
@@ -153,6 +164,14 @@ Press `q` to quit.
   - [ ] Input level meter (VU meter)
   - [ ] Pitch shift display (semitones + ratio)
   - [ ] Frequency spectrum display
+  - [ ] Mute status indicator
+  - [ ] Volume level indicator
+  - [ ] Delay amount indicator
+  - [ ] Current device names (capture/playback)
+- [ ] Implement device selection UI
+  - [ ] List available devices
+  - [ ] Allow selecting capture device
+  - [ ] Allow selecting playback device
 - [ ] Implement help overlay
 
 ### Phase 5: Controls
@@ -161,7 +180,17 @@ Press `q` to quit.
   - [ ] +/- for frequency ratio adjustment
   - [ ] =/_ for fine tune
   - [ ] r - reset pitch
-  - [ ] m - mute/unmute
+  - [ ] m - mute/unmute microphone
+  - [ ] v - cycle volume preset
+  - [ ] [ - decrease volume
+  - [ ] ] - increase volume
+  - [ ] d - adjust delay
+  - [ ] < - decrease delay
+  - [ ] > - increase delay
+  - [/list ] i - show input devices
+  - [ ] o - show/list output devices
+  - [ ] 1-9 - select input device by number
+  - [ ] Shift+1-9 - select output device by number
   - [ ] h - toggle help
   - [ ] q - quit
 
