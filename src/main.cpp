@@ -26,11 +26,13 @@ int main() {
         std::cerr << "Failed to open capture device" << std::endl;
         return 1;
     }
+    std::cout << "Capture device opened" << std::endl;
 
     if (!audio.open_playback()) {
         std::cerr << "Failed to open playback device" << std::endl;
         return 1;
     }
+    std::cout << "Playback device opened" << std::endl;
 
     PitchShifter shifter(4096, 1024, 44100);
     TUI ui;
@@ -40,15 +42,25 @@ int main() {
     float input_buffer[buffer_frames];
     float output_buffer[buffer_frames];
 
+    int loop_count = 0;
     while (running) {
         int captured = audio.capture(input_buffer, buffer_frames);
         if (captured > 0) {
+            if (loop_count % 100 == 0) {
+                std::cout << "Captured: " << captured << " frames" << std::endl;
+            }
             shifter.process(input_buffer, output_buffer, captured);
-            audio.playback(output_buffer, captured);
+            int played = audio.playback(output_buffer, captured);
+            if (loop_count % 100 == 0) {
+                std::cout << "Played: " << played << " frames" << std::endl;
+            }
         }
 
         int key = ui.get_key_input();
-        (void)key;
+        if (key == 'q' || key == 'Q') {
+            std::cout << "Quit key pressed" << std::endl;
+            running = false;
+        }
 
         AudioStats stats;
         stats.input_level = 0.0f;
@@ -57,6 +69,8 @@ int main() {
         stats.spectrum.resize(64);
         stats.muted = false;
         ui.render(stats);
+        
+        loop_count++;
     }
 
     ui.shutdown();

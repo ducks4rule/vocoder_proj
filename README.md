@@ -115,14 +115,14 @@ Press `q` to quit.
 - [x] Create stub source files for compilation test
 
 ### Phase 2: Audio I/O
-- [ ] Implement ALSA audio capture (microphone input)
-  - [ ] Initialize ALSA PCM device
-  - [ ] Configure capture parameters (44100Hz, 16-bit, mono)
+- [x] Implement ALSA audio capture (microphone input)
+  - [x] Initialize ALSA PCM device
+  - [x] Configure capture parameters (44100Hz, float32, mono)
   - [ ] Implement ring buffer for audio data
-  - [ ] Handle audio device errors and recovery
-- [ ] Implement ALSA audio playback (speaker output)
-  - [ ] Initialize playback PCM device
-  - [ ] Configure playback parameters
+  - [x] Handle audio device errors and recovery
+- [x] Implement ALSA audio playback (speaker output)
+  - [x] Initialize playback PCM device
+  - [x] Configure playback parameters
   - [ ] Implement low-latency output buffer
   - [ ] Sync capture and playback streams
 
@@ -175,7 +175,8 @@ Press `q` to quit.
 - [ ] Implement help overlay
 
 ### Phase 5: Controls
-- [ ] Implement keyboard input handling
+- [x] Implement keyboard input handling (basic q to quit)
+- [ ] Implement full keyboard controls
   - [ ] Homerow keys (A-K) for pitch selection
   - [ ] +/- for frequency ratio adjustment
   - [ ] =/_ for fine tune
@@ -187,11 +188,12 @@ Press `q` to quit.
   - [ ] d - adjust delay
   - [ ] < - decrease delay
   - [ ] > - increase delay
-  - [/list ] i - show input devices
+  - [ ] i - show input devices
   - [ ] o - show/list output devices
   - [ ] 1-9 - select input device by number
   - [ ] Shift+1-9 - select output device by number
   - [ ] h - toggle help
+  - [x] q - quit
   - [ ] q - quit
 
 ### Phase 6: Integration & Testing

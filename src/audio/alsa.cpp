@@ -82,7 +82,71 @@ bool ALSADevice::open_capture(const char* device_name) {
 }
 
 bool ALSADevice::open_playback(const char* device_name) {
-    (void)device_name;
+    int err;
+
+    err = snd_pcm_open(&pcm_playback_, device_name, 
+                       SND_PCM_STREAM_PLAYBACK, SND_PCM_NONBLOCK);
+    if (err < 0) {
+        std::cerr << "Cannot open playback device '" << device_name << "': " 
+                  << snd_strerror(err) << std::endl;
+        return false;
+    }
+
+    snd_pcm_hw_params_t* params;
+    snd_pcm_hw_params_malloc(&params);
+
+    err = snd_pcm_hw_params_any(pcm_playback_, params);
+    if (err < 0) {
+        std::cerr << "Cannot initialize playback parameters: " 
+                  << snd_strerror(err) << std::endl;
+        snd_pcm_hw_params_free(params);
+        return false;
+    }
+
+    err = snd_pcm_hw_params_set_access(pcm_playback_, params, SND_PCM_ACCESS_RW_INTERLEAVED);
+    if (err < 0) {
+        std::cerr << "Cannot set playback access type: " << snd_strerror(err) << std::endl;
+        snd_pcm_hw_params_free(params);
+        return false;
+    }
+
+    err = snd_pcm_hw_params_set_format(pcm_playback_, params, SND_PCM_FORMAT_FLOAT);
+    if (err < 0) {
+        std::cerr << "Cannot set playback sample format: " << snd_strerror(err) << std::endl;
+        snd_pcm_hw_params_free(params);
+        return false;
+    }
+
+    unsigned int rate = sample_rate_;
+    err = snd_pcm_hw_params_set_rate_near(pcm_playback_, params, &rate, 0);
+    if (err < 0) {
+        std::cerr << "Cannot set playback sample rate: " << snd_strerror(err) << std::endl;
+        snd_pcm_hw_params_free(params);
+        return false;
+    }
+
+    err = snd_pcm_hw_params_set_channels(pcm_playback_, params, channels_);
+    if (err < 0) {
+        std::cerr << "Cannot set playback channel count: " << snd_strerror(err) << std::endl;
+        snd_pcm_hw_params_free(params);
+        return false;
+    }
+
+    err = snd_pcm_hw_params(pcm_playback_, params);
+    if (err < 0) {
+        std::cerr << "Cannot set playback hardware parameters: " << snd_strerror(err) << std::endl;
+        snd_pcm_hw_params_free(params);
+        return false;
+    }
+
+    snd_pcm_hw_params_free(params);
+
+    err = snd_pcm_prepare(pcm_playback_);
+    if (err < 0) {
+        std::cerr << "Cannot prepare playback interface: " << snd_strerror(err) << std::endl;
+        return false;
+    }
+
     return true;
 }
 
@@ -120,7 +184,21 @@ int ALSADevice::capture(float* buffer, int frames) {
 }
 
 int ALSADevice::playback(const float* buffer, int frames) {
-    (void)buffer;
-    (void)frames;
-    return 0;
+    if (!pcm_playback_) return 0;
+
+    snd_pcm_sframes_t result = snd_pcm_writei(pcm_playback_, buffer, frames);
+
+    if (result == -EAGAIN) {
+        return 0;
+    } else if (result < 0) {
+        std::cerr << "Playback error: " << snd_strerror(result) << std::endl;
+        result = snd_pcm_recover(pcm_playback_, (int)result, 0);
+        if (result < 0) {
+            std::cerr << "Cannot recover from playback error: " << snd_strerror(result) << std::endl;
+            return 0;
+        }
+        return 0;
+    }
+
+    return (int)result;
 }
