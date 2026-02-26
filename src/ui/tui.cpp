@@ -55,7 +55,7 @@ namespace {
     }
 }
 
-TUI::TUI() : initialized_(false), width_(80), height_(24) {
+TUI::TUI() : initialized_(false), width_(80), height_(24), smoothed_input_(-60.0f), smoothed_output_(-60.0f) {
 }
 
 TUI::~TUI() {
@@ -92,13 +92,17 @@ void TUI::shutdown() {
 void TUI::render(const AudioStats& stats) {
     if (!initialized_) return;
 
+    constexpr float smoothing = 0.3f;
+    smoothed_input_ = smoothed_input_ * (1.0f - smoothing) + stats.input_level * smoothing;
+    smoothed_output_ = smoothed_output_ * (1.0f - smoothing) + stats.output_level * smoothing;
+
     werase(stdscr);
 
-    int in_bar = db_to_bar(stats.input_level);
-    int out_bar = db_to_bar(stats.output_level);
+    int in_bar = db_to_bar(smoothed_input_);
+    int out_bar = db_to_bar(smoothed_output_);
 
-    draw_bar(1, 2, "IN:", in_bar, stats.input_level);
-    draw_bar(3, 2, "OUT:", out_bar, stats.output_level);
+    draw_bar(1, 2, "IN:", in_bar, smoothed_input_);
+    draw_bar(3, 2, "OUT:", out_bar, smoothed_output_);
 
     int vol_percent = static_cast<int>(stats.volume * 100);
     draw_vertical_meter(6, 2, vol_percent, stats.output_level);

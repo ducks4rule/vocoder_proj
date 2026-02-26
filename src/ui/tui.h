@@ -27,4 +27,6 @@ private:
     bool initialized_;
     int width_;
     int height_;
+    float smoothed_input_;
+    float smoothed_output_;
 };

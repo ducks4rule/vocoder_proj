@@ -2,6 +2,7 @@
 #include <csignal>
 #include <atomic>
 #include <cmath>
+#include <cstring>
 #include "audio/alsa.h"
 #include "dsp/pitchshift.h"
 #include "ui/tui.h"
@@ -65,11 +66,11 @@ int main() {
 
     int loop_count = 0;
     while (running) {
+        memset(input_buffer, 0, sizeof(input_buffer));
+        memset(output_buffer, 0, sizeof(output_buffer));
+
         int captured = audio.capture(input_buffer, buffer_frames);
         if (captured > 0) {
-            if (loop_count % 100 == 0) {
-                LOG_DEBUG("Captured: " + std::to_string(captured) + " frames");
-            }
 
             if (!muted) {
                 shifter.process(input_buffer, output_buffer, captured);
@@ -80,9 +81,18 @@ int main() {
             }
 
             int played = audio.playback(output_buffer, captured);
-            if (loop_count % 100 == 0) {
-                LOG_DEBUG("Played: " + std::to_string(played) + " frames");
-            }
+
+            AudioStats stats;
+            float input_db = calculate_db(input_buffer, captured);
+            float output_db = calculate_db(output_buffer, captured);
+            stats.input_level = input_db;
+            stats.output_level = output_db;
+            stats.pitch_ratio = shifter.get_pitch_ratio();
+            stats.pitch_semitones = 0;
+            stats.spectrum.resize(64);
+            stats.muted = muted;
+            stats.volume = shifter.get_volume();
+            ui.render(stats);
         }
 
         int key = ui.get_key_input();
@@ -102,16 +112,6 @@ int main() {
             LOG_DEBUG("Volume: " + std::to_string(static_cast<int>(shifter.get_volume() * 100)) + "%");
         }
 
-        AudioStats stats;
-        stats.input_level = calculate_db(input_buffer, captured);
-        stats.output_level = calculate_db(output_buffer, captured);
-        stats.pitch_ratio = shifter.get_pitch_ratio();
-        stats.pitch_semitones = 0;
-        stats.spectrum.resize(64);
-        stats.muted = muted;
-        stats.volume = shifter.get_volume();
-        ui.render(stats);
-        
         loop_count++;
     }
 
