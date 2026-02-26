@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstddef>
+#include "dsp/fft.h"
 
 class PitchShifter {
 public:
@@ -21,4 +22,12 @@ private:
     int sample_rate_;
     float pitch_ratio_;
     float volume_;
+
+    FFTProcessor* fft_;
+    float* Hann_window_;
+    float* input_buffer_;
+    float* output_buffer_;
+    float* fft_real_;
+    float* fft_imag_;
+    size_t buffer_pos_;
 };

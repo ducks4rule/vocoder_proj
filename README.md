@@ -152,12 +152,13 @@ The input and output level meters display audio levels in dB scale (-60 to 0 dB)
   - [ ] Allow selecting playback device
 
 ### Phase 3: DSP / Pitch Shifting
-- [ ] Implement FFT wrapper (fftw3)
-  - [ ] Create forward FFT function
-  - [ ] Create inverse FFT function
-  - [ ] Handle memory allocation and cleanup
+- [x] Implement FFT wrapper (fftw3)
+  - [x] Create forward FFT function
+  - [x] Create inverse FFT function
+  - [x] Handle memory allocation and cleanup
+  - [x] Hann window function pre-computed
+  - [ ] Implement FFT passthrough test
 - [ ] Implement SMB PitchShift algorithm
-  - [ ] Implement Hann window function
   - [ ] Implement STFT (Short-Time Fourier Transform)
   - [ ] Implement frequency bin scaling for pitch shift
   - [ ] Implement phase vocoder for smooth pitch shifting
