@@ -177,7 +177,7 @@ The input and output level meters display audio levels in dB scale (-60 to 0 dB)
 - [x] Implement UI components
   - [x] Input level meter (VU meter)
   - [x] Master volume indicator
-  - [ ] Move mute sign to avoid overlap with master meter
+  - [x] Move mute sign to avoid overlap with master meter (entire meter turns red when muted)
   - [ ] Pitch shift display (semitones + ratio)
   - [ ] Frequency spectrum display
   - [x] Mute status indicator

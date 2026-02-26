@@ -37,17 +37,18 @@ namespace {
         attroff(COLOR_PAIR(4));
     }
 
-    void draw_vertical_meter(int row, int col, int percent, float output_db) {
+    void draw_vertical_meter(int row, int col, int percent, float output_db, bool muted) {
         int filled = (percent + 5) / 10;
+        int color = muted ? 3 : get_color_for_db(output_db);
         for (int i = 0; i < MASTER_HEIGHT; i++) {
             int level = MASTER_HEIGHT - 1 - i;
             int r = row + i;
             int threshold = (level + 1) * 10;
             mvprintw(r, col, "%3d%% ", threshold);
             if (filled > level) {
-                attron(COLOR_PAIR(get_color_for_db(output_db)));
+                attron(COLOR_PAIR(color));
                 addstr("#");
-                attroff(COLOR_PAIR(get_color_for_db(output_db)));
+                attroff(COLOR_PAIR(color));
             } else {
                 addstr("-");
             }
@@ -105,14 +106,11 @@ void TUI::render(const AudioStats& stats) {
     draw_bar(3, 2, "OUT:", out_bar, smoothed_output_);
 
     int vol_percent = static_cast<int>(stats.volume * 100);
-    draw_vertical_meter(6, 2, vol_percent, stats.output_level);
-    mvprintw(5, 2, "MASTER");
+    draw_vertical_meter(5, 2, vol_percent, stats.output_level, stats.muted);
 
-    if (stats.muted) {
-        attron(COLOR_PAIR(3));
-        mvprintw(8, 2, "MUTED");
-        attroff(COLOR_PAIR(3));
-    }
+    attron(COLOR_PAIR(stats.muted ? 3 : 5));
+    mvprintw(16, 2, stats.muted ? "MUTE" : "MASTER");
+    attroff(COLOR_PAIR(stats.muted ? 3 : 5));
 
     attron(COLOR_PAIR(5));
     mvprintw(23, 2, "[q:quit] [m:mute] [ [/]:vol ]  [+/-:adj] [=/_:fine steps] [r:reset]");
