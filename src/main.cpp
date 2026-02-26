@@ -33,7 +33,7 @@ float calculate_db(const float* buffer, int frames) {
 
 int main() {
     Logger::instance().set_file("/tmp/vocoder-tui.log");
-    Logger::instance().set_level(LogLevel::DEBUG);
+    Logger::instance().set_level(LogLevel::INFO);
 
     std::signal(SIGINT, signal_handler);
     std::signal(SIGTERM, signal_handler);
@@ -105,11 +105,9 @@ int main() {
         } else if (key == ']') {
             float v = shifter.get_volume();
             shifter.set_volume(std::min(v + 0.05f, 1.0f));
-            LOG_DEBUG("Volume: " + std::to_string(static_cast<int>(shifter.get_volume() * 100)) + "%");
         } else if (key == '[') {
             float v = shifter.get_volume();
             shifter.set_volume(std::max(v - 0.05f, 0.0f));
-            LOG_DEBUG("Volume: " + std::to_string(static_cast<int>(shifter.get_volume() * 100)) + "%");
         }
 
         loop_count++;

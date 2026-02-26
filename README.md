@@ -106,6 +106,21 @@ The application will:
 
 Press `q` to quit.
 
+## Implementation Notes
+
+### Audio Level Meters
+The input and output level meters display audio levels in dB scale (-60 to 0 dB):
+- **Buffer initialization**: Audio buffers are zeroed with `memset()` each iteration to handle partial ALSA reads
+- **dB calculation**: Only calculated when audio is successfully captured (`captured > 0`)
+- **Smoothing**: Exponential moving average (0.3 factor) applied in TUI render to reduce flicker
+
+### Logging
+- Uses singleton Logger with thread-safe mutex
+- Log levels: DEBUG, INFO, ERROR
+- Output to file `/tmp/vocoder-tui.log` with timestamps
+- Errors also printed to stderr
+- Macros: `LOG_DEBUG()`, `LOG_INFO()`, `LOG_ERROR()`
+
 ## TODO
 
 ### Phase 1: Project Setup
@@ -118,16 +133,15 @@ Press `q` to quit.
 - [x] Implement ALSA audio capture (microphone input)
   - [x] Initialize ALSA PCM device
   - [x] Configure capture parameters (44100Hz, float32, mono)
-  - [ ] Implement ring buffer for audio data
+  - [x] Handle partial reads with buffer zeroing
   - [x] Handle audio device errors and recovery
 - [x] Implement ALSA audio playback (speaker output)
   - [x] Initialize playback PCM device
   - [x] Configure playback parameters
-  - [ ] Implement low-latency output buffer
-  - [ ] Sync capture and playback streams
+  - [x] Handle EAGAIN and buffer underruns
 
 ### Phase 2.5: Audio Features
-- [x] Add mute/unmute microphone
+- [x] Add mute/unmute output
 - [x] Add output volume control (0.0 - 1.0)
 - [ ] Add playback delay (monitoring delay)
   - [ ] Implement ring buffer for delay
@@ -162,6 +176,8 @@ Press `q` to quit.
   - [ ] Implement log-frequency scaling for display
 - [x] Implement UI components
   - [x] Input level meter (VU meter)
+  - [x] Master volume indicator
+  - [ ] Move mute sign to avoid overlap with master meter
   - [ ] Pitch shift display (semitones + ratio)
   - [ ] Frequency spectrum display
   - [x] Mute status indicator
@@ -209,8 +225,10 @@ Press `q` to quit.
 - [ ] Add command-line arguments
 - [ ] Create man page
 - [ ] Create PKGBUILD for AUR
+- [ ] Implement playback delay (monitoring delay)
 
 ### Future Design Considerations
+- [ ] Implement delay option for monitoring
 - [ ] Consider switching to callback-based audio (async) for lower latency
   - Current: loop-based (polling) - simpler, easier to debug
   - Future: callback-based - lower CPU, lower latency, more complex

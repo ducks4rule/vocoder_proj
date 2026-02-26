@@ -71,8 +71,6 @@ bool ALSADevice::open_capture(const char* device_name) {
     snd_pcm_hw_params_get_buffer_size(params, (snd_pcm_uframes_t*)&buffer_size_);
     snd_pcm_hw_params_free(params);
 
-    LOG_DEBUG(std::string("capture: buffer_size = ") + std::to_string(buffer_size_) + " frames");
-
     err = snd_pcm_prepare(pcm_capture_);
     if (err < 0) {
         LOG_ERROR(std::string("Cannot prepare capture interface: ") + snd_strerror(err));
@@ -142,8 +140,6 @@ bool ALSADevice::open_playback(const char* device_name) {
     snd_pcm_hw_params_get_buffer_size(params, &playback_buffer_size);
     snd_pcm_hw_params_free(params);
 
-    LOG_DEBUG(std::string("playback: buffer_size = ") + std::to_string(playback_buffer_size) + " frames");
-
     err = snd_pcm_prepare(pcm_playback_);
     if (err < 0) {
         LOG_ERROR(std::string("Cannot prepare playback interface: ") + snd_strerror(err));
@@ -189,10 +185,6 @@ int ALSADevice::capture(float* buffer, int frames) {
         return 0;
     }
 
-    if (result != frames) {
-        LOG_DEBUG(std::string("capture: partial read ") + std::to_string(result) + " of " + std::to_string(frames) + " frames");
-    }
-
     return (int)result;
 }
 
@@ -202,29 +194,21 @@ int ALSADevice::playback(const float* buffer, int frames) {
     snd_pcm_sframes_t result = snd_pcm_writei(pcm_playback_, buffer, frames);
 
     if (result == -EAGAIN) {
-        LOG_DEBUG("playback: EAGAIN, retrying...");
         usleep(1000);
         result = snd_pcm_writei(pcm_playback_, buffer, frames);
         if (result == -EAGAIN) {
-            LOG_DEBUG("playback: EAGAIN again, dropping frames");
             return 0;
         }
     }
     
     if (result < 0) {
         LOG_ERROR(std::string("playback error: ") + snd_strerror(result));
-        LOG_DEBUG("attempting recovery...");
         result = snd_pcm_recover(pcm_playback_, (int)result, 0);
         if (result < 0) {
             LOG_ERROR(std::string("recovery failed: ") + snd_strerror(result));
             return 0;
         }
-        LOG_DEBUG("recovery successful");
         return 0;
-    }
-
-    if (result != frames) {
-        LOG_DEBUG(std::string("partial write: requested ") + std::to_string(frames) + ", wrote " + std::to_string(result));
     }
 
     return (int)result;
