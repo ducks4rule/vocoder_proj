@@ -5,10 +5,12 @@
 
 struct AudioStats {
     float input_level;
+    float output_level;
     float pitch_ratio;
     int pitch_semitones;
     std::vector<float> spectrum;
     bool muted;
+    float volume;
 };
 
 class TUI {

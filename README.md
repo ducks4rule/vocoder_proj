@@ -127,8 +127,8 @@ Press `q` to quit.
   - [ ] Sync capture and playback streams
 
 ### Phase 2.5: Audio Features
-- [ ] Add mute/unmute microphone
-- [ ] Add output volume control (0.0 - 1.0)
+- [x] Add mute/unmute microphone
+- [x] Add output volume control (0.0 - 1.0)
 - [ ] Add playback delay (monitoring delay)
   - [ ] Implement ring buffer for delay
   - [ ] Make delay configurable (0-500ms)
@@ -151,21 +151,21 @@ Press `q` to quit.
 - [ ] Implement log-frequency transformation
 
 ### Phase 4: TUI
-- [ ] Implement ncurses TUI framework
-  - [ ] Initialize ncurses (colors, keypad, cursor)
-  - [ ] Create main render loop
+- [x] Implement ncurses TUI framework
+  - [x] Initialize ncurses (colors, keypad, cursor)
+  - [x] Create main render loop
   - [ ] Handle terminal resize
-  - [ ] Cleanup on exit
+  - [x] Cleanup on exit
 - [ ] Implement spectrum visualizer
   - [ ] Convert FFT magnitude to dB scale
   - [ ] Map to ASCII/UTF-8 characters
   - [ ] Implement log-frequency scaling for display
-- [ ] Implement UI components
-  - [ ] Input level meter (VU meter)
+- [x] Implement UI components
+  - [x] Input level meter (VU meter)
   - [ ] Pitch shift display (semitones + ratio)
   - [ ] Frequency spectrum display
-  - [ ] Mute status indicator
-  - [ ] Volume level indicator
+  - [x] Mute status indicator
+  - [x] Volume level indicator
   - [ ] Delay amount indicator
   - [ ] Current device names (capture/playback)
 - [ ] Implement device selection UI
@@ -178,13 +178,13 @@ Press `q` to quit.
 - [x] Implement keyboard input handling (basic q to quit)
 - [ ] Implement full keyboard controls
   - [ ] Homerow keys (A-K) for pitch selection
-  - [ ] +/- for frequency ratio adjustment
-  - [ ] =/_ for fine tune
-  - [ ] r - reset pitch
-  - [ ] m - mute/unmute microphone
+  - [x] +/- for frequency ratio adjustment
+  - [x] =/_ for fine tune
+  - [x] r - reset pitch
+  - [x] m - mute/unmute microphone
   - [ ] v - cycle volume preset
-  - [ ] [ - decrease volume
-  - [ ] ] - increase volume
+  - [x] [ - decrease volume
+  - [x] ] - increase volume
   - [ ] d - adjust delay
   - [ ] < - decrease delay
   - [ ] > - increase delay
@@ -194,18 +194,17 @@ Press `q` to quit.
   - [ ] Shift+1-9 - select output device by number
   - [ ] h - toggle help
   - [x] q - quit
-  - [ ] q - quit
 
 ### Phase 6: Integration & Testing
-- [ ] Integrate audio, DSP, and TUI components
+- [x] Integrate audio, DSP, and TUI components
 - [ ] Test real-time audio processing latency
 - [ ] Tune FFT size and hop size for performance
-- [ ] Handle audio glitches and buffer underruns
+- [x] Handle audio glitches and buffer underruns
 - [ ] Test on target system (Arch Linux)
 - [ ] Optimize for low CPU usage
 
 ### Phase 7: Polish
-- [ ] Add error handling throughout
+- [x] Add error handling throughout
 - [ ] Add configuration file support
 - [ ] Add command-line arguments
 - [ ] Create man page
