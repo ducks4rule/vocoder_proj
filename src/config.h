@@ -23,4 +23,7 @@ constexpr float METER_RED_DB = -3.0f;
 // Master meter
 constexpr int MASTER_HEIGHT = 10;
 
+// TUI
+constexpr float SMOOTHING_FACTOR = 0.3f;  // for level meter smoothing
+
 #endif

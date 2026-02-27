@@ -2,6 +2,7 @@
 #include <csignal>
 #include <atomic>
 #include <cstring>
+#include <vector>
 #include "audio/alsa.h"
 #include "dsp/pitchshift.h"
 #include "dsp/utils.h"
@@ -45,21 +46,20 @@ int main() {
     TUI ui;
     ui.init();
 
-    const int buffer_frames = BUFFER_FRAMES;
+    std::vector<float> input_buffer(BUFFER_FRAMES);
+    std::vector<float> output_buffer(BUFFER_FRAMES);
     const size_t spectrum_bins = FFT_SIZE / 2 + 1;
-    float input_buffer[buffer_frames];
-    float output_buffer[buffer_frames];
 
     bool muted = false;
 
     while (running) {
-        memset(input_buffer, 0, sizeof(input_buffer));
-        memset(output_buffer, 0, sizeof(output_buffer));
+        std::fill(input_buffer.begin(), input_buffer.end(), 0.0f);
+        std::fill(output_buffer.begin(), output_buffer.end(), 0.0f);
 
-        int captured = audio.capture(input_buffer, buffer_frames);
+        int captured = audio.capture(input_buffer.data(), BUFFER_FRAMES);
         if (captured > 0) {
 
-            shifter.process(input_buffer, output_buffer, captured);
+            shifter.process(input_buffer.data(), output_buffer.data(), captured);
 
             if (muted) {
                 for (int i = 0; i < captured; i++) {
@@ -67,11 +67,11 @@ int main() {
                 }
             }
 
-            audio.playback(output_buffer, captured);
+            audio.playback(output_buffer.data(), captured);
 
             AudioStats stats;
-            float input_db = calculate_db(input_buffer, captured);
-            float output_db = calculate_db(output_buffer, captured);
+            float input_db = calculate_db(input_buffer.data(), captured);
+            float output_db = calculate_db(output_buffer.data(), captured);
             stats.input_level = input_db;
             stats.output_level = output_db;
             stats.pitch_ratio = shifter.get_pitch_ratio();

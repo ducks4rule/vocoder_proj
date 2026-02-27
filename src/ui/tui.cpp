@@ -126,12 +126,11 @@ void TUI::shutdown() {
     initialized_ = false;
 }
 
-void TUI::render(const AudioStats& stats) {
+    void TUI::render(const AudioStats& stats) {
     if (!initialized_) return;
 
-    constexpr float smoothing = 0.3f;
-    smoothed_input_ = smoothed_input_ * (1.0f - smoothing) + stats.input_level * smoothing;
-    smoothed_output_ = smoothed_output_ * (1.0f - smoothing) + stats.output_level * smoothing;
+    smoothed_input_ = smoothed_input_ * (1.0f - SMOOTHING_FACTOR) + stats.input_level * SMOOTHING_FACTOR;
+    smoothed_output_ = smoothed_output_ * (1.0f - SMOOTHING_FACTOR) + stats.output_level * SMOOTHING_FACTOR;
 
     werase(stdscr);
 

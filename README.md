@@ -135,17 +135,18 @@ The spectrum displays frequency content from microphone input:
 - **Position**: Right side of master meter (column 30)
 - **Data source**: Always reflects INPUT (microphone), even when muted
 - **Display**: 32 vertical bars using log-frequency scale
-- **Range**: -30dB to 0dB (quieter sounds hidden for better contrast)
+- **Range**: -35dB to 0dB (quieter sounds hidden for better contrast)
 
 #### Configuration (src/config.h)
 | Constant | Default | Description |
 |----------|---------|-------------|
-| SPECTRUM_MIN_DB | -30.0f | Minimum dB (noise floor - below this shows empty) |
+| SPECTRUM_MIN_DB | -35.0f | Minimum dB (noise floor - below this shows empty) |
 | SPECTRUM_MAX_DB | 0.0f | Maximum dB (clipping) |
 | SPECTRUM_BARS | 32 | Number of frequency bars |
 | SPECTRUM_HEIGHT | 10 | Bar height in characters |
-
-Lower SPECTRUM_GAMMA (e.g., 0.3) makes spikes more dramatic. Higher (e.g., 0.7) is more linear.
+| METER_MIN_DB | -60.0f | Level meter minimum |
+| METER_MAX_DB | 0.0f | Level meter maximum |
+| SMOOTHING_FACTOR | 0.3f | Level meter smoothing |
 
 ## TODO
 
