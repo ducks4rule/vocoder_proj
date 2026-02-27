@@ -59,6 +59,8 @@ int main() {
     ui.init();
 
     const int buffer_frames = 1024;
+    const size_t fft_size = 4096;
+    const size_t spectrum_bins = fft_size / 2 + 1;
     float input_buffer[buffer_frames];
     float output_buffer[buffer_frames];
 
@@ -72,9 +74,9 @@ int main() {
         int captured = audio.capture(input_buffer, buffer_frames);
         if (captured > 0) {
 
-            if (!muted) {
-                shifter.process(input_buffer, output_buffer, captured);
-            } else {
+            shifter.process(input_buffer, output_buffer, captured);
+
+            if (muted) {
                 for (int i = 0; i < captured; i++) {
                     output_buffer[i] = 0.0f;
                 }
@@ -89,7 +91,8 @@ int main() {
             stats.output_level = output_db;
             stats.pitch_ratio = shifter.get_pitch_ratio();
             stats.pitch_semitones = 0;
-            stats.spectrum.resize(64);
+            stats.spectrum.resize(spectrum_bins);
+            shifter.get_spectrum(stats.spectrum.data(), stats.spectrum.size());
             stats.muted = muted;
             stats.volume = shifter.get_volume();
             ui.render(stats);

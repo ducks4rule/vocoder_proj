@@ -73,6 +73,15 @@ The vocoder uses the SMB PitchShift algorithm:
 6. Compute inverse FFT
 7. Overlap-add output frames
 
+#### Current Implementation Status
+- FFT operations are fully implemented and tested
+- Pitch shifting algorithm is stubbed but not yet implemented
+- Currently operates in passthrough mode (FFT → IFFT without pitch modification)
+- Requires SMB PitchShift algorithm implementation for actual pitch shifting
+- Overlap-add synthesis not yet implemented
+- Phase vocoder for smooth pitch shifting not implemented
+- Log-frequency transformation for analysis not implemented
+
 ## Installation (Arch Linux)
 
 ```bash
@@ -120,6 +129,23 @@ The input and output level meters display audio levels in dB scale (-60 to 0 dB)
 - Output to file `/tmp/vocoder-tui.log` with timestamps
 - Errors also printed to stderr
 - Macros: `LOG_DEBUG()`, `LOG_INFO()`, `LOG_ERROR()`
+
+### Spectrum Visualizer
+The spectrum displays frequency content from microphone input:
+- **Position**: Right side of master meter (column 30)
+- **Data source**: Always reflects INPUT (microphone), even when muted
+- **Display**: 32 vertical bars using log-frequency scale
+- **Range**: -30dB to 0dB (quieter sounds hidden for better contrast)
+
+#### Configuration (src/config.h)
+| Constant | Default | Description |
+|----------|---------|-------------|
+| SPECTRUM_MIN_DB | -30.0f | Minimum dB (noise floor - below this shows empty) |
+| SPECTRUM_MAX_DB | 0.0f | Maximum dB (clipping) |
+| SPECTRUM_BARS | 32 | Number of frequency bars |
+| SPECTRUM_HEIGHT | 10 | Bar height in characters |
+
+Lower SPECTRUM_GAMMA (e.g., 0.3) makes spikes more dramatic. Higher (e.g., 0.7) is more linear.
 
 ## TODO
 
@@ -171,16 +197,17 @@ The input and output level meters display audio levels in dB scale (-60 to 0 dB)
   - [x] Create main render loop
   - [ ] Handle terminal resize
   - [x] Cleanup on exit
-- [ ] Implement spectrum visualizer
-  - [ ] Convert FFT magnitude to dB scale
-  - [ ] Map to ASCII/UTF-8 characters
-  - [ ] Implement log-frequency scaling for display
+- [x] Implement spectrum visualizer
+  - [x] Convert FFT magnitude to dB scale
+  - [x] Map to ASCII characters
+  - [x] Implement log-frequency scaling for display
+  - [x] Add gamma for non-linear display (spikes more visible)
 - [x] Implement UI components
   - [x] Input level meter (VU meter)
   - [x] Master volume indicator
   - [x] Move mute sign to avoid overlap with master meter (entire meter turns red when muted)
   - [ ] Pitch shift display (semitones + ratio)
-  - [ ] Frequency spectrum display
+  - [x] Frequency spectrum display
   - [x] Mute status indicator
   - [x] Volume level indicator
   - [ ] Delay amount indicator

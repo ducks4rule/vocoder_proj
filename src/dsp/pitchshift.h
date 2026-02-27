@@ -16,6 +16,8 @@ public:
 
     void process(const float* input, float* output, int num_frames);
 
+    void get_spectrum(float* spectrum, size_t num_bins);
+
 private:
     size_t fft_size_;
     size_t hop_size_;
