@@ -1,6 +1,8 @@
 #pragma once
 
 #include <cstddef>
+#include <memory>
+#include <vector>
 #include "dsp/fft.h"
 
 class PitchShifter {
@@ -25,11 +27,10 @@ private:
     float pitch_ratio_;
     float volume_;
 
-    FFTProcessor* fft_;
-    float* Hann_window_;
-    float* input_buffer_;
-    float* output_buffer_;
-    float* fft_real_;
-    float* fft_imag_;
-    size_t buffer_pos_;
+    std::unique_ptr<FFTProcessor> fft_;
+    std::vector<float> Hann_window_;
+    std::vector<float> input_buffer_;
+    std::vector<float> output_buffer_;
+    std::vector<float> fft_real_;
+    std::vector<float> fft_imag_;
 };

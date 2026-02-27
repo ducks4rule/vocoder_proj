@@ -6,8 +6,10 @@
 
 namespace {
     const int METER_W = METER_WIDTH;
-    const float MIN_DB = SPECTRUM_MIN_DB;
-    const float MAX_DB = SPECTRUM_MAX_DB;
+    const float METER_MIN = METER_MIN_DB;
+    const float METER_MAX = METER_MAX_DB;
+    const float SPEC_MIN = SPECTRUM_MIN_DB;
+    const float SPEC_MAX = SPECTRUM_MAX_DB;
     const float YELLOW = METER_YELLOW_DB;
     const float RED = METER_RED_DB;
     const int MASTER_H = MASTER_HEIGHT;
@@ -16,7 +18,7 @@ namespace {
     const float MAX_FREQ = SPECTRUM_MAX_FREQ;
 
     int db_to_bar(float db) {
-        int bar = static_cast<int>((db - MIN_DB) / (MAX_DB - MIN_DB) * METER_W);
+        int bar = static_cast<int>((db - METER_MIN) / (METER_MAX - METER_MIN) * METER_W);
         return std::max(0, std::min(bar, METER_W));
     }
 
@@ -69,9 +71,9 @@ namespace {
             
             int bin = static_cast<int>(freq / SAMPLE_RATE * FFT_SIZE);
             
-            float db = (bin >= 0 && static_cast<size_t>(bin) < num_bins) ? spectrum[bin] : MIN_DB;
+            float db = (bin >= 0 && static_cast<size_t>(bin) < num_bins) ? spectrum[bin] : SPEC_MIN;
             
-            int height = static_cast<int>((db - MIN_DB) / (MAX_DB - MIN_DB) * MASTER_H);
+            int height = static_cast<int>((db - SPEC_MIN) / (SPEC_MAX - SPEC_MIN) * MASTER_H);
             height = std::max(0, std::min(height, MASTER_H));
             
             int draw_col = col + 10 + bar * 2;

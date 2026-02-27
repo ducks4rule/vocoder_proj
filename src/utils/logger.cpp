@@ -57,10 +57,6 @@ void Logger::log(LogLevel level, const std::string& msg) {
         file_ << line << std::endl;
         file_.flush();
     }
-
-    if (level == LogLevel::ERROR) {
-        std::cerr << line << std::endl;
-    }
 }
 
 std::string Logger::get_timestamp() {

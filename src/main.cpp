@@ -1,12 +1,13 @@
 #include <iostream>
 #include <csignal>
 #include <atomic>
-#include <cmath>
 #include <cstring>
 #include "audio/alsa.h"
 #include "dsp/pitchshift.h"
+#include "dsp/utils.h"
 #include "ui/tui.h"
 #include "utils/logger.h"
+#include "config.h"
 
 namespace {
     std::atomic<bool> running{true};
@@ -15,20 +16,6 @@ namespace {
 void signal_handler(int signal) {
     (void)signal;
     running = false;
-}
-
-float calculate_db(const float* buffer, int frames) {
-    if (frames <= 0) return -60.0f;
-    float sum = 0.0f;
-    for (int i = 0; i < frames; i++) {
-        sum += buffer[i] * buffer[i];
-    }
-    float rms = std::sqrt(sum / frames);
-    if (rms > 0.0f) {
-        float db = 20.0f * std::log10(rms);
-        return std::max(-60.0f, std::min(db, 0.0f));
-    }
-    return -60.0f;
 }
 
 int main() {
@@ -54,19 +41,17 @@ int main() {
     }
     LOG_INFO("Playback device opened");
 
-    PitchShifter shifter(4096, 1024, 44100);
+    PitchShifter shifter(FFT_SIZE, HOP_SIZE, SAMPLE_RATE);
     TUI ui;
     ui.init();
 
-    const int buffer_frames = 1024;
-    const size_t fft_size = 4096;
-    const size_t spectrum_bins = fft_size / 2 + 1;
+    const int buffer_frames = BUFFER_FRAMES;
+    const size_t spectrum_bins = FFT_SIZE / 2 + 1;
     float input_buffer[buffer_frames];
     float output_buffer[buffer_frames];
 
     bool muted = false;
 
-    int loop_count = 0;
     while (running) {
         memset(input_buffer, 0, sizeof(input_buffer));
         memset(output_buffer, 0, sizeof(output_buffer));
@@ -82,7 +67,7 @@ int main() {
                 }
             }
 
-            int played = audio.playback(output_buffer, captured);
+            audio.playback(output_buffer, captured);
 
             AudioStats stats;
             float input_db = calculate_db(input_buffer, captured);
@@ -113,7 +98,6 @@ int main() {
             shifter.set_volume(std::max(v - 0.05f, 0.0f));
         }
 
-        loop_count++;
     }
 
     ui.shutdown();

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstddef>
+#include <fftw3.h>
 
 class FFTProcessor {
 public:
@@ -16,4 +17,7 @@ private:
     size_t fft_size_;
     void* plan_forward_;
     void* plan_inverse_;
+    float* input_buffer_;
+    float* output_buffer_;
+    fftwf_complex* complex_buffer_;
 };
