@@ -55,7 +55,6 @@ A real-time vocoder with TUI for Arch Linux. Captures microphone input, processe
 - `fftw3` - Fast Fourier Transform (GPL)
 - `cmake` - Build system
 - `gcc` / `clang` - C++ compiler
-- `gitleaks` - Secret detection in git commits
 
 #### Audio Parameters
 - Sample Rate: 44100 Hz (configurable)
