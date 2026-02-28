@@ -1,5 +1,7 @@
 # Vocoder-TUI
 
+This is a small project to practice buffer handling and fft application. Behold:
+
 A real-time vocoder with TUI for Arch Linux. Captures microphone input, processes it through FFT-based pitch shifting (phase vocoder using STFT), and outputs to speakers.
 
 ## Features
@@ -41,11 +43,42 @@ A real-time vocoder with TUI for Arch Linux. Captures microphone input, processe
 | Key | Function |
 |-----|----------|
 | `q` | Quit application |
-| `+` / `-` | Adjust frequency ratio by ±0.1 |
-| `=` / `_` | Fine tune frequency ratio by ±0.01 |
-| `r` | Reset pitch to 1.0 (no shift) |
+| `+` / `-` | Adjust pitch ratio by ±0.1 |
+| `=` / `_` | Fine tune pitch ratio by ±0.01 |
+| `t` / `T` | Time stretch by ±10% |
+| `r` | Reset pitch and time to default (1.0) |
 | `m` | Mute/unmute output |
 | `h` | Show help |
+
+#### Note Keys (Chords Supported)
+Press multiple keys simultaneously to create chords:
+| Key | Note | Semitones from C4 |
+|-----|------|---------------------|
+| `A` | C4 | 0 |
+| `W` | C#4 | 1 |
+| `S` | D4 | 2 |
+| `E` | D#4 | 3 |
+| `D` | E4 | 4 |
+| `F` | F4 | 5 |
+| `T` | F#4 | 6 |
+| `G` | G4 | 7 |
+| `Y` | G#4 | 8 |
+| `H` | A4 | 9 |
+| `U` | A#4 | 10 |
+| `J` | B4 | 11 |
+| `K` | C5 | 12 |
+
+### Features
+
+#### Phase Vocoder
+- Real-time pitch shifting using STFT with phase propagation
+- Smooth output without phasing artifacts
+- Supports simultaneous pitch shifts (chords)
+
+#### Time Stretching
+- Change audio duration without changing pitch
+- Useful for beat matching or tempo adjustment
+- Works independently or combined with pitch shifting
 
 ### Technical Details
 
@@ -63,24 +96,27 @@ A real-time vocoder with TUI for Arch Linux. Captures microphone input, processe
 - Window Function: Hann window
 
 #### Algorithm
-The vocoder uses the SMB PitchShift algorithm:
+The vocoder uses the phase vocoder algorithm:
+
+**Pitch Shifting:**
 1. Apply Hann window to input frame
 2. Compute FFT (STFT)
-3. Convert to log-frequency scale
-4. Apply pitch shift by scaling frequency bins
-    - Adjust phase
-5. Convert back to linear frequency
-6. Compute inverse FFT
-7. Overlap-add output frames
+3. For each frequency bin, propagate phase: `phase_out = phase_in + hop_size * 2π * frequency / sample_rate`
+4. Scale frequency bins by pitch ratio (interpolate magnitudes)
+5. Compute inverse FFT
+6. Overlap-add output frames
+
+**Time Stretching:**
+- Similar to pitch shifting but without phase adjustment
+- Scale hop size to change duration without affecting pitch
+- Can be combined with pitch shifting
 
 #### Current Implementation Status
-- FFT operations are fully implemented and tested
-- Pitch shifting algorithm is stubbed but not yet implemented
-- Currently operates in passthrough mode (FFT → IFFT without pitch modification)
-- Requires SMB PitchShift algorithm implementation for actual pitch shifting
-- Overlap-add synthesis not yet implemented
-- Phase vocoder for smooth pitch shifting not implemented
-- Log-frequency transformation for analysis not implemented
+- [x] STFT with overlap-add (implemented)
+- [ ] Phase vocoder for pitch shifting (TODO)
+- [ ] Time stretching (TODO)
+- [x] Note key controls (A-K) - mapped but need phase vocoder
+- [ ] Chord support - need phase vocoder implementation
 
 ## Installation (Arch Linux)
 
@@ -179,18 +215,20 @@ The spectrum displays frequency content from microphone input:
   - [ ] Allow selecting playback device
 
 ### Phase 3: DSP / Pitch Shifting
-- [x] Implement FFT wrapper (fftw3)
-  - [x] Create forward FFT function
-  - [x] Create inverse FFT function
-  - [x] Handle memory allocation and cleanup
-  - [x] Hann window function pre-computed
-  - [ ] Implement FFT passthrough test
-- [ ] Implement SMB PitchShift algorithm
-  - [ ] Implement STFT (Short-Time Fourier Transform)
-  - [ ] Implement frequency bin scaling for pitch shift
-  - [ ] Implement phase vocoder for smooth pitch shifting
-  - [ ] Implement overlap-add synthesis
-- [ ] Implement log-frequency transformation
+- [x] Implement STFTProcessor with FFT
+  - [x] Forward FFT with Hann window
+  - [x] Inverse FFT with overlap-add
+  - [x] Three buffer architecture (input_history, processing_frame, output_accum)
+- [ ] Implement phase vocoder for pitch shifting
+  - [ ] Phase propagation across frames
+  - [ ] Frequency bin interpolation for pitch ratio
+  - [ ] Handle ratio > 1 (pitch up) and < 1 (pitch down)
+- [ ] Implement time stretching
+  - [ ] Scale hop size for duration change
+  - [ ] Combine with pitch shifting
+- [ ] Implement chord support
+  - [ ] Multiple pitch shifts blended together
+  - [ ] Track active note keys
 
 ### Phase 4: TUI
 - [x] Implement ncurses TUI framework
