@@ -21,7 +21,7 @@ include_directories(
 set(SOURCES
     src/main.cpp
     src/audio/alsa.cpp
-    src/dsp/fft.cpp
+    src/dsp/stft.cpp
     src/dsp/pitchshift.cpp
     src/ui/tui.cpp
     src/utils/logger.cpp

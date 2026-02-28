@@ -4,6 +4,7 @@
 #include <cstring>
 #include <vector>
 #include "audio/alsa.h"
+#include "dsp/stft.h"
 #include "dsp/pitchshift.h"
 #include "dsp/utils.h"
 #include "ui/tui.h"
@@ -43,11 +44,14 @@ int main() {
     LOG_INFO("Playback device opened");
 
     PitchShifter shifter(FFT_SIZE, HOP_SIZE, SAMPLE_RATE);
+    STFTProcessor stft(FFT_SIZE, HOP_SIZE, SAMPLE_RATE);
     TUI ui;
     ui.init();
 
     std::vector<float> input_buffer(BUFFER_FRAMES);
     std::vector<float> output_buffer(BUFFER_FRAMES);
+    std::vector<float> freq_real(FFT_SIZE / 2 + 1);
+    std::vector<float> freq_imag(FFT_SIZE / 2 + 1);
     const size_t spectrum_bins = FFT_SIZE / 2 + 1;
 
     bool muted = false;
@@ -58,8 +62,9 @@ int main() {
 
         int captured = audio.capture(input_buffer.data(), BUFFER_FRAMES);
         if (captured > 0) {
-
-            shifter.process(input_buffer.data(), output_buffer.data(), captured);
+            stft.forward(input_buffer.data(), captured, freq_real.data(), freq_imag.data());
+            shifter.process(freq_real.data(), freq_imag.data(), freq_real.size());
+            stft.inverse(freq_real.data(), freq_imag.data(), output_buffer.data(), captured);
 
             if (muted) {
                 for (int i = 0; i < captured; i++) {
@@ -77,7 +82,7 @@ int main() {
             stats.pitch_ratio = shifter.get_pitch_ratio();
             stats.pitch_semitones = 0;
             stats.spectrum.resize(spectrum_bins);
-            shifter.get_spectrum(stats.spectrum.data(), stats.spectrum.size());
+            stft.get_spectrum(stats.spectrum.data(), stats.spectrum.size());
             stats.muted = muted;
             stats.volume = shifter.get_volume();
             ui.render(stats);
