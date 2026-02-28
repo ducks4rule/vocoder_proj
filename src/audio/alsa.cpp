@@ -95,6 +95,22 @@ bool ALSADevice::open_playback(const char* device_name) {
         return false;
     }
 
+    // Slightly increase buffer size for safety margin (2x)
+    snd_pcm_hw_params_t* params;
+    snd_pcm_hw_params_malloc(&params);
+    
+    err = snd_pcm_hw_params_any(pcm_playback_, params);
+    if (err >= 0) {
+        snd_pcm_uframes_t new_buffer_size = playback_buffer_size * 2;
+        snd_pcm_uframes_t actual_buffer_size = new_buffer_size;
+        err = snd_pcm_hw_params_set_buffer_size_near(pcm_playback_, params, &actual_buffer_size);
+        if (err >= 0) {
+            LOG_INFO(std::string("Playback buffer size: ") + std::to_string(actual_buffer_size));
+            snd_pcm_hw_params(pcm_playback_, params);
+        }
+    }
+    snd_pcm_hw_params_free(params);
+
     err = snd_pcm_start(pcm_playback_);
     if (err < 0) {
         LOG_ERROR(std::string("Cannot start playback interface: ") + snd_strerror(err));
@@ -140,16 +156,11 @@ int ALSADevice::capture(float* buffer, int frames) {
 int ALSADevice::playback(const float* buffer, int frames) {
     if (!pcm_playback_) return 0;
 
+    // Wait for buffer to have space (prevents underruns)
+    snd_pcm_wait(pcm_playback_, 100);
+
     snd_pcm_sframes_t result = snd_pcm_writei(pcm_playback_, buffer, frames);
 
-    if (result == -EAGAIN) {
-        usleep(1000);
-        result = snd_pcm_writei(pcm_playback_, buffer, frames);
-        if (result == -EAGAIN) {
-            return 0;
-        }
-    }
-    
     if (result < 0) {
         LOG_ERROR(std::string("playback error: ") + snd_strerror(result));
         result = snd_pcm_recover(pcm_playback_, (int)result, 0);
@@ -157,7 +168,6 @@ int ALSADevice::playback(const float* buffer, int frames) {
             LOG_ERROR(std::string("recovery failed: ") + snd_strerror(result));
             return 0;
         }
-        return 0;
     }
 
     return (int)result;
