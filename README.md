@@ -114,9 +114,11 @@ The vocoder uses the phase vocoder algorithm:
 #### Current Implementation Status
 - [x] STFT with overlap-add (implemented)
 - [x] Phase vocoder for pitch shifting (basic implementation - magnitude scaling + phase propagation)
-- [ ] Time stretching (TODO)
-- [ ] Note key controls (A-K) - keyboard handlers not yet implemented
-- [ ] Chord support (TODO)
+- [x] Pitch adjustment keys (+/-/=/_/r)
+- [x] Note key controls (A-K for C4-C5)
+- [ ] Chord support (TODO - press multiple note keys to blend)
+- [ ] Time stretching (TODO - change duration without changing pitch)
+- [ ] Pitch detection (TODO - auto-detect input pitch for intelligent shifting)
 - [x] ALSA/PulseAudio integration (uses plug:default device)
 - [x] Volume control with [ and ] keys
 

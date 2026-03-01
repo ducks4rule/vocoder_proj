@@ -11,6 +11,7 @@
 #include "ui/tui.h"
 #include "utils/logger.h"
 #include "config.h"
+#include "controls.h"
 
 namespace {
     std::atomic<bool> running{true};
@@ -50,6 +51,7 @@ int main() {
     STFTProcessor stft(FFT_SIZE, HOP_SIZE, SAMPLE_RATE);
     TUI ui;
     ui.init();
+    Controls controls(shifter);
 
     std::vector<float> input_buffer(BUFFER_FRAMES);
     std::vector<float> output_buffer(BUFFER_FRAMES);
@@ -92,18 +94,12 @@ int main() {
         }
 
         int key = ui.get_key_input();
-        if (key == 'q' || key == 'Q') {
-            LOG_INFO("Quit key pressed");
-            running = false;
-        } else if (key == 'm' || key == 'M') {
-            muted = !muted;
-            LOG_INFO(std::string("Mute: ") + (muted ? "ON" : "OFF"));
-        } else if (key == ']') {
-            float v = shifter.get_volume();
-            shifter.set_volume(std::min(v + 0.05f, 1.0f));
-        } else if (key == '[') {
-            float v = shifter.get_volume();
-            shifter.set_volume(std::max(v - 0.05f, 0.0f));
+        if (key != 0) {
+            bool running_copy = running.load();
+            controls.handle_key(key, running_copy, muted);
+            if (!running_copy) {
+                running.store(false);
+            }
         }
 
     }

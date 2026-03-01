@@ -25,6 +25,7 @@ set(SOURCES
     src/dsp/pitchshift.cpp
     src/ui/tui.cpp
     src/utils/logger.cpp
+    src/controls.cpp
 )
 
 add_executable(vocoder-tui ${SOURCES})
