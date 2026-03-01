@@ -23,6 +23,7 @@ set(SOURCES
     src/audio/alsa.cpp
     src/dsp/stft.cpp
     src/dsp/pitchshift.cpp
+    src/dsp/pitchdetect.cpp
     src/ui/tui.cpp
     src/utils/logger.cpp
     src/controls.cpp

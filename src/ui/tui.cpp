@@ -126,7 +126,31 @@ void TUI::shutdown() {
     initialized_ = false;
 }
 
-    void TUI::render(const AudioStats& stats) {
+void TUI::draw_spectrum_boxed(const char* label, int row, int col, const float* spectrum, size_t num_bins) {
+    if (!spectrum || num_bins == 0) return;
+    
+    draw_spectrum(row + 1, col, spectrum, num_bins);
+    
+    attron(COLOR_PAIR(5));
+    mvprintw(row, col, "[%s]", label);
+    attroff(COLOR_PAIR(5));
+    
+    int left = col + 8;
+    int right = col + 75;
+    int top = row;
+    int bottom = row + 13;
+    
+    mvaddch(top, left, ACS_ULCORNER);
+    mvaddch(top, right, ACS_URCORNER);
+    mvaddch(bottom, left, ACS_LLCORNER);
+    mvaddch(bottom, right, ACS_LRCORNER);
+    mvhline(top, left + 1, ACS_HLINE, right - left - 1);
+    mvhline(bottom, left + 1, ACS_HLINE, right - left - 1);
+    mvvline(top + 1, left, ACS_VLINE, bottom - top - 1);
+    mvvline(top + 1, right, ACS_VLINE, bottom - top - 1);
+}
+
+void TUI::render(const AudioStats& stats) {
     if (!initialized_) return;
 
     smoothed_input_ = smoothed_input_ * (1.0f - SMOOTHING_FACTOR) + stats.input_level * SMOOTHING_FACTOR;
@@ -152,12 +176,28 @@ void TUI::shutdown() {
              static_cast<float>(stats.pitch_semitones), stats.pitch_ratio);
     attroff(COLOR_PAIR(5));
 
+    attron(COLOR_PAIR(5));
+    if (stats.detected_freq > 0) {
+        float output_freq = stats.detected_freq * stats.pitch_ratio;
+        mvprintw(19, 2, "In: %.1f Hz -> Out: %.1f Hz", stats.detected_freq, output_freq);
+    } else {
+        mvprintw(19, 2, "Input: -- Hz");
+    }
+    if (stats.active_note >= 0) {
+        mvprintw(20, 2, "Target: %d semitones", stats.active_note);
+    }
+    attroff(COLOR_PAIR(5));
+
     if (!stats.spectrum.empty()) {
-        draw_spectrum(5, 30, stats.spectrum.data(), stats.spectrum.size());
+        draw_spectrum_boxed("INPUT", 4, 30, stats.spectrum.data(), stats.spectrum.size());
+    }
+
+    if (!stats.output_spectrum.empty()) {
+        draw_spectrum_boxed("OUTPUT", 18, 30, stats.output_spectrum.data(), stats.output_spectrum.size());
     }
 
     attron(COLOR_PAIR(5));
-    mvprintw(23, 2, "[q:quit] [m:mute] [ [/]:vol ]  [+/-:adj] [=/_:fine steps] [r:reset]");
+    mvprintw(32, 2, "[q:quit] [m:mute] [ [/]:vol ]  [+/-:adj] [=/_:fine steps] [r:reset]");
     attroff(COLOR_PAIR(5));
 
     refresh();

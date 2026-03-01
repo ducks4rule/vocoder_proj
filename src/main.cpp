@@ -7,6 +7,7 @@
 #include "audio/alsa.h"
 #include "dsp/stft.h"
 #include "dsp/pitchshift.h"
+#include "dsp/pitchdetect.h"
 #include "dsp/utils.h"
 #include "ui/tui.h"
 #include "utils/logger.h"
@@ -49,6 +50,7 @@ int main() {
 
     PitchShifter shifter(FFT_SIZE, HOP_SIZE, SAMPLE_RATE);
     STFTProcessor stft(FFT_SIZE, HOP_SIZE, SAMPLE_RATE);
+    PitchDetector pitch_detector(BUFFER_FRAMES, SAMPLE_RATE);
     TUI ui;
     ui.init();
     Controls controls(shifter);
@@ -67,6 +69,9 @@ int main() {
 
         int captured = audio.capture(input_buffer.data(), BUFFER_FRAMES);
         if (captured > 0) {
+            float detected_freq = pitch_detector.detect(input_buffer.data(), captured);
+            controls.set_detected_frequency(detected_freq);
+            
             stft.forward(input_buffer.data(), captured, freq_real.data(), freq_imag.data());
             shifter.process(freq_real.data(), freq_imag.data(), freq_real.size());
             stft.inverse(freq_real.data(), freq_imag.data(), output_buffer.data(), captured);
@@ -74,6 +79,10 @@ int main() {
             if (muted) {
                 for (int i = 0; i < captured; i++) {
                     output_buffer[i] = 0.0f;
+                }
+                for (size_t i = 0; i < freq_real.size(); i++) {
+                    freq_real[i] = 0.0f;
+                    freq_imag[i] = 0.0f;
                 }
             }
 
@@ -88,8 +97,13 @@ int main() {
             stats.pitch_semitones = static_cast<int>(12.0f * std::log2(stats.pitch_ratio));
             stats.spectrum.resize(spectrum_bins);
             stft.get_spectrum(stats.spectrum.data(), stats.spectrum.size());
+            stats.output_spectrum.resize(spectrum_bins);
+            calculate_spectrum_db(freq_real.data(), freq_imag.data(), 
+                                 stats.output_spectrum.data(), stats.output_spectrum.size());
             stats.muted = muted;
             stats.volume = shifter.get_volume();
+            stats.detected_freq = controls.get_detected_frequency();
+            stats.active_note = controls.get_last_note();
             ui.render(stats);
         }
 

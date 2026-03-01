@@ -15,3 +15,13 @@ inline float calculate_db(const float* buffer, int frames) {
     }
     return -60.0f;
 }
+
+inline void calculate_spectrum_db(const float* real, const float* imag, 
+                                  float* spectrum, size_t num_bins,
+                                  float min_db = -35.0f, float max_db = 0.0f) {
+    for (size_t i = 0; i < num_bins; i++) {
+        float mag = std::sqrt(real[i] * real[i] + imag[i] * imag[i]);
+        float db = 20.0f * std::log10(mag + 1e-10f);
+        spectrum[i] = std::max(min_db, std::min(db, max_db));
+    }
+}

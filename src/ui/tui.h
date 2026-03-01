@@ -9,8 +9,11 @@ struct AudioStats {
     float pitch_ratio;
     int pitch_semitones;
     std::vector<float> spectrum;
+    std::vector<float> output_spectrum;
     bool muted;
     float volume;
+    float detected_freq;
+    int active_note;
 };
 
 class TUI {
@@ -22,6 +25,7 @@ public:
     void shutdown();
     void render(const AudioStats& stats);
     int get_key_input();
+    void draw_spectrum_boxed(const char* label, int row, int col, const float* spectrum, size_t num_bins);
 
 private:
     bool initialized_;

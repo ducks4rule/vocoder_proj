@@ -16,6 +16,7 @@ public:
                  float* output, int num_samples);
 
     void get_spectrum(float* spectrum, size_t num_bins);
+    void get_output_spectrum(float* spectrum, size_t num_bins);
 
     size_t fft_size() const { return fft_size_; }
     size_t hop_size() const { return hop_size_; }
