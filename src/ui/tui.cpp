@@ -147,6 +147,11 @@ void TUI::shutdown() {
     mvprintw(16, 2, stats.muted ? "MUTE" : "MASTER");
     attroff(COLOR_PAIR(stats.muted ? 3 : 5));
 
+    attron(COLOR_PAIR(5));
+    mvprintw(18, 2, "Pitch: %+.1f st (%.2fx)", 
+             static_cast<float>(stats.pitch_semitones), stats.pitch_ratio);
+    attroff(COLOR_PAIR(5));
+
     if (!stats.spectrum.empty()) {
         draw_spectrum(5, 30, stats.spectrum.data(), stats.spectrum.size());
     }

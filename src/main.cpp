@@ -2,6 +2,7 @@
 #include <csignal>
 #include <atomic>
 #include <cstring>
+#include <cmath>
 #include <vector>
 #include "audio/alsa.h"
 #include "dsp/stft.h"
@@ -30,14 +31,16 @@ int main() {
     LOG_INFO("Vocoder-TUI v1.0.0 starting...");
     LOG_INFO("Press 'q' to quit");
 
+    list_alsa_devices();
+
     ALSADevice audio;
-    if (!audio.open_capture()) {
+    if (!audio.open_capture("plug:default")) {
         LOG_ERROR("Failed to open capture device");
         return 1;
     }
     LOG_INFO("Capture device opened");
 
-    if (!audio.open_playback()) {
+    if (!audio.open_playback("plug:default")) {
         LOG_ERROR("Failed to open playback device");
         return 1;
     }
@@ -80,7 +83,7 @@ int main() {
             stats.input_level = input_db;
             stats.output_level = output_db;
             stats.pitch_ratio = shifter.get_pitch_ratio();
-            stats.pitch_semitones = 0;
+            stats.pitch_semitones = static_cast<int>(12.0f * std::log2(stats.pitch_ratio));
             stats.spectrum.resize(spectrum_bins);
             stft.get_spectrum(stats.spectrum.data(), stats.spectrum.size());
             stats.muted = muted;

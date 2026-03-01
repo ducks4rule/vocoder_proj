@@ -4,6 +4,8 @@
 #include <cstddef>
 #include <alsa/asoundlib.h>
 
+void list_alsa_devices();
+
 class ALSADevice {
 public:
     ALSADevice();

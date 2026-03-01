@@ -104,6 +104,8 @@ void STFTProcessor::inverse(const float* real_in, const float* imag_in,
     fftwf_execute(static_cast<fftwf_plan>(plan_inverse_));
 
     // Apply Hann window and normalize
+    // The window is applied in both forward and inverse for proper reconstruction
+    // with overlap-add. The normalization factor accounts for the window sum.
     for (size_t i = 0; i < fft_size_; i++) {
         processing_frame_[i] = fft_output_[i] * Hann_window_[i] / static_cast<float>(fft_size_);
     }

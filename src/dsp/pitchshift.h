@@ -25,4 +25,8 @@ private:
 
     std::vector<float> fft_real_;
     std::vector<float> fft_imag_;
+
+    std::vector<float> last_phase_real_;
+    std::vector<float> last_phase_imag_;
+    std::vector<float> last_phase_;  // Phase angles for phase vocoder
 };

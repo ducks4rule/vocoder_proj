@@ -113,10 +113,12 @@ The vocoder uses the phase vocoder algorithm:
 
 #### Current Implementation Status
 - [x] STFT with overlap-add (implemented)
-- [ ] Phase vocoder for pitch shifting (TODO)
+- [x] Phase vocoder for pitch shifting (basic implementation - magnitude scaling + phase propagation)
 - [ ] Time stretching (TODO)
-- [x] Note key controls (A-K) - mapped but need phase vocoder
-- [ ] Chord support - need phase vocoder implementation
+- [ ] Note key controls (A-K) - keyboard handlers not yet implemented
+- [ ] Chord support (TODO)
+- [x] ALSA/PulseAudio integration (uses plug:default device)
+- [x] Volume control with [ and ] keys
 
 ## Installation (Arch Linux)
 
@@ -158,6 +160,12 @@ The input and output level meters display audio levels in dB scale (-60 to 0 dB)
 - **Buffer initialization**: Audio buffers are zeroed with `memset()` each iteration to handle partial ALSA reads
 - **dB calculation**: Only calculated when audio is successfully captured (`captured > 0`)
 - **Smoothing**: Exponential moving average (0.3 factor) applied in TUI render to reduce flicker
+
+### ALSA/PulseAudio Integration
+- Uses "plug:default" ALSA device which routes through PulseAudio/PipeWire
+- Format: 16-bit signed integer (S16), 44100 Hz, mono
+- Buffer size: 4096 frames
+- Debug logging available: lists all available PCM devices at startup
 
 ### Logging
 - Uses singleton Logger with thread-safe mutex
