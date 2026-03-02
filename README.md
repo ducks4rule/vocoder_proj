@@ -310,11 +310,18 @@ Record audio, play it on loop, and apply DSP effects (pitch/volume) in real-time
 - OVERDUB: (mic + loop buffer) → loop buffer, loop → DSP → speaker
 
 **Implementation:**
-- [ ] Create `src/dsp/loopmachine.h/cpp` with circular buffer
-- [ ] Add `LOOP_BUFFER_SECONDS` to config.h (default ~10 seconds)
-- [ ] Route audio through LoopMachine in main.cpp
-- [ ] Add loop controls to Controls class
-- [ ] Show loop status in TUI (state, length, overdub indicator)
+- [x] Create `src/dsp/loopmachine.h/cpp` with circular buffer
+- [x] Add `LOOP_BUFFER_SECONDS` to config.h (default ~10 seconds)
+- [x] Route audio through LoopMachine in main.cpp
+- [x] Add loop controls to Controls class
+- [x] Show loop status in TUI (state, length, overdub indicator)
+
+**KNOWN BUGS (to fix):**
+- Audio flow issue: DSP runs AFTER the loop, should run on both
+- Overdub not working properly (debug needed)
+- `l` key toggles RECORDING ↔ PLAYING, no IDLE state between
+- Pitch detection runs on mic, not on loop output
+- In RECORDING mode, no output sent to speaker (by design?)
 
 ### Phase 7: Chord Support (HIGH PRIORITY)
 - [ ] Press multiple note keys (A-K) simultaneously to blend
