@@ -24,6 +24,7 @@ set(SOURCES
     src/dsp/stft.cpp
     src/dsp/pitchshift.cpp
     src/dsp/pitchdetect.cpp
+    src/dsp/loopmachine.cpp
     src/ui/tui.cpp
     src/utils/logger.cpp
     src/controls.cpp

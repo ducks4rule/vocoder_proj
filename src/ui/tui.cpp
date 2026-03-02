@@ -188,6 +188,19 @@ void TUI::render(const AudioStats& stats) {
     }
     attroff(COLOR_PAIR(5));
 
+    float loop_len = static_cast<float>(stats.loop_recorded_samples) / SAMPLE_RATE;
+    float loop_max = static_cast<float>(stats.loop_max_samples) / SAMPLE_RATE;
+    attron(COLOR_PAIR(5));
+    mvprintw(21, 2, "Loop: [%s] %.1fs / %.1fs", 
+             stats.loop_state.c_str(), loop_len, loop_max);
+    attroff(COLOR_PAIR(5));
+
+    if (!stats.loop_message.empty()) {
+        attron(COLOR_PAIR(3));
+        mvprintw(22, 2, "%s", stats.loop_message.c_str());
+        attroff(COLOR_PAIR(3));
+    }
+
     if (!stats.spectrum.empty()) {
         draw_spectrum_boxed("INPUT", 4, 30, stats.spectrum.data(), stats.spectrum.size());
     }
@@ -197,7 +210,8 @@ void TUI::render(const AudioStats& stats) {
     }
 
     attron(COLOR_PAIR(5));
-    mvprintw(32, 2, "[q:quit] [m:mute] [ [/]:vol ]  [+/-:adj] [=/_:fine steps] [r:reset]");
+    mvprintw(32, 2, "[q:quit] [m:mute] [ [/]:vol ]  [+/-:adj] [=/_:fine] [r:reset]");
+    mvprintw(33, 2, "[l:rec] [p:play] [o:overdub] [x:clear]");
     attroff(COLOR_PAIR(5));
 
     refresh();

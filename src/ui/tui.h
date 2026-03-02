@@ -14,6 +14,12 @@ struct AudioStats {
     float volume;
     float detected_freq;
     int active_note;
+
+    // Loop Machine
+    std::string loop_state;
+    int loop_recorded_samples;
+    int loop_max_samples;
+    std::string loop_message;
 };
 
 class TUI {

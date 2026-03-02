@@ -8,6 +8,7 @@
 #include "dsp/stft.h"
 #include "dsp/pitchshift.h"
 #include "dsp/pitchdetect.h"
+#include "dsp/loopmachine.h"
 #include "dsp/utils.h"
 #include "ui/tui.h"
 #include "utils/logger.h"
@@ -51,9 +52,10 @@ int main() {
     PitchShifter shifter(FFT_SIZE, HOP_SIZE, SAMPLE_RATE);
     STFTProcessor stft(FFT_SIZE, HOP_SIZE, SAMPLE_RATE);
     PitchDetector pitch_detector(BUFFER_FRAMES, SAMPLE_RATE);
+    LoopMachine loop(SAMPLE_RATE);
     TUI ui;
     ui.init();
-    Controls controls(shifter);
+    Controls controls(shifter, loop);
 
     std::vector<float> input_buffer(BUFFER_FRAMES);
     std::vector<float> output_buffer(BUFFER_FRAMES);
@@ -72,7 +74,10 @@ int main() {
             float detected_freq = pitch_detector.detect(input_buffer.data(), captured);
             controls.set_detected_frequency(detected_freq);
             
-            stft.forward(input_buffer.data(), captured, freq_real.data(), freq_imag.data());
+            std::vector<float> loop_output(BUFFER_FRAMES);
+            loop.process(input_buffer.data(), captured, loop_output.data(), captured);
+            
+            stft.forward(loop_output.data(), captured, freq_real.data(), freq_imag.data());
             shifter.process(freq_real.data(), freq_imag.data(), freq_real.size());
             stft.inverse(freq_real.data(), freq_imag.data(), output_buffer.data(), captured);
 
@@ -104,6 +109,11 @@ int main() {
             stats.volume = shifter.get_volume();
             stats.detected_freq = controls.get_detected_frequency();
             stats.active_note = controls.get_last_note();
+            stats.loop_state = loop.get_state_string();
+            stats.loop_recorded_samples = loop.get_recorded_samples();
+            stats.loop_max_samples = loop.get_max_samples();
+            stats.loop_message = loop.get_empty_message();
+            loop.clear_empty_message();
             ui.render(stats);
         }
 

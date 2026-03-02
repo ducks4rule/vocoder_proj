@@ -1,5 +1,6 @@
 #include "controls.h"
 #include "dsp/pitchshift.h"
+#include "dsp/loopmachine.h"
 #include "utils/logger.h"
 #include <cmath>
 #include <cstdint>
@@ -24,8 +25,8 @@ namespace {
     };
 }
 
-Controls::Controls(PitchShifter& shifter)
-    : shifter_(shifter) {
+Controls::Controls(PitchShifter& shifter, LoopMachine& loop)
+    : shifter_(shifter), loop_(loop) {
 }
 
 Controls::~Controls() = default;
@@ -185,6 +186,30 @@ void Controls::handle_key(int key, bool& running, bool& muted) {
                 shifter_.set_pitch_ratio(NOTE_FREQUENCIES[12] / detected_freq_);
             }
             last_note_semitone_ = 12;
+            break;
+
+        case 'l':
+        case 'L':
+            loop_.toggle_recording();
+            LOG_INFO(std::string("Loop: ") + loop_.get_state_string());
+            break;
+
+        case 'p':
+        case 'P':
+            loop_.toggle_playback();
+            LOG_INFO(std::string("Loop: ") + loop_.get_state_string());
+            break;
+
+        case 'o':
+        case 'O':
+            loop_.toggle_overdub();
+            LOG_INFO(std::string("Loop: ") + loop_.get_state_string());
+            break;
+
+        case 'x':
+        case 'X':
+            loop_.clear();
+            LOG_INFO("Loop: cleared");
             break;
 
         default:

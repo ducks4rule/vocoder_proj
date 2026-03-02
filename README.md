@@ -119,10 +119,12 @@ The vocoder uses the phase vocoder algorithm:
 - [x] Pitch adjustment keys (+/-/=/_/r)
 - [x] Note key controls (A-K for C4-C5) - maps input to target note
 - [x] Dual spectrum display (INPUT and OUTPUT stacked vertically)
+- [ ] Loop Machine (TODO - record, playback, overdub, clear)
 - [ ] Chord support (TODO - press multiple note keys to blend)
 - [ ] Time stretching (TODO - change duration without changing pitch)
 - [x] ALSA/PulseAudio integration (uses plug:default device)
 - [x] Volume control with [ and ] keys
+- [x] Mute with m key
 
 ## Installation (Arch Linux)
 
@@ -231,10 +233,10 @@ The spectrum displays frequency content from microphone input:
   - [x] Forward FFT with Hann window
   - [x] Inverse FFT with overlap-add
   - [x] Three buffer architecture (input_history, processing_frame, output_accum)
-- [ ] Implement phase vocoder for pitch shifting
-  - [ ] Phase propagation across frames
-  - [ ] Frequency bin interpolation for pitch ratio
-  - [ ] Handle ratio > 1 (pitch up) and < 1 (pitch down)
+- [x] Implement phase vocoder for pitch shifting
+  - [x] Phase propagation across frames
+  - [x] Frequency bin interpolation for pitch ratio
+  - [x] Handle ratio > 1 (pitch up) and < 1 (pitch down)
 - [ ] Implement time stretching
   - [ ] Scale hop size for duration change
   - [ ] Combine with pitch shifting
@@ -290,7 +292,44 @@ The spectrum displays frequency content from microphone input:
   - [ ] h - toggle help
   - [x] q - quit
 
-### Phase 6: Integration & Testing
+### Phase 6: Loop Machine (HIGH PRIORITY)
+Record audio, play it on loop, and apply DSP effects (pitch/volume) in real-time.
+
+**New Keyboard Controls:**
+| Key | Function |
+|-----|----------|
+| `l` | Start/stop recording to loop buffer |
+| `p` | Play/pause loop playback |
+| `o` | Toggle overdub (layer new recording on loop) |
+| `x` | Clear the loop buffer |
+
+**Loop Machine States:**
+- IDLE: Normal passthrough (mic → DSP → speaker)
+- RECORDING: Mic → loop buffer (no output)
+- PLAYING: Loop buffer → DSP → speaker (repeating)
+- OVERDUB: (mic + loop buffer) → loop buffer, loop → DSP → speaker
+
+**Implementation:**
+- [ ] Create `src/dsp/loopmachine.h/cpp` with circular buffer
+- [ ] Add `LOOP_BUFFER_SECONDS` to config.h (default ~10 seconds)
+- [ ] Route audio through LoopMachine in main.cpp
+- [ ] Add loop controls to Controls class
+- [ ] Show loop status in TUI (state, length, overdub indicator)
+
+### Phase 7: Chord Support (HIGH PRIORITY)
+- [ ] Press multiple note keys (A-K) simultaneously to blend
+- [ ] Track active note keys, compute weighted average pitch
+
+### Phase 8: Playback Delay (MEDIUM PRIORITY)
+- [ ] Ring buffer for monitoring delay
+- [ ] Configurable 0-500ms
+- [ ] Keys: `d` adjust, `<`/`>` decrease/increase
+
+### Phase 9: Time Stretching (LOW PRIORITY)
+- [ ] t/T keys: adjust time stretch ratio ±10%
+- [ ] Not critical for core functionality
+
+### Phase 10: Integration & Testing
 - [x] Integrate audio, DSP, and TUI components
 - [ ] Test real-time audio processing latency
 - [ ] Tune FFT size and hop size for performance

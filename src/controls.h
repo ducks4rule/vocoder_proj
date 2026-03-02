@@ -3,10 +3,11 @@
 #include <cstddef>
 
 class PitchShifter;
+class LoopMachine;
 
 class Controls {
 public:
-    Controls(PitchShifter& shifter);
+    Controls(PitchShifter& shifter, LoopMachine& loop);
     ~Controls();
 
     void handle_key(int key, bool& running, bool& muted);
@@ -16,6 +17,7 @@ public:
 
 private:
     PitchShifter& shifter_;
+    LoopMachine& loop_;
     float detected_freq_ = 0.0f;
     int last_note_semitone_ = -1;
 };

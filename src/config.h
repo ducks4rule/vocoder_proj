@@ -26,4 +26,8 @@ constexpr int MASTER_HEIGHT = 10;
 // TUI
 constexpr float SMOOTHING_FACTOR = 0.3f;  // for level meter smoothing
 
+// Loop Machine
+constexpr float LOOP_BUFFER_SECONDS = 10.0f;
+constexpr float OVERDUB_MIX = 0.5f;  // 0.5 = 50% loop + 50% mic
+
 #endif
